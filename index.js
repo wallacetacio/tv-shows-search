@@ -1,22 +1,39 @@
 const handleSearch = async (event) => {
   event.preventDefault();
-
+  
   // implemente a consulta a partir daqui
+  const messageStatus = document.getElementById('message');
+  const showsList = document.getElementById('shows');
+  const url = `https://api.tvmaze.com/search/shows?q=${document.getElementById('query').value}`;
+  const result = await fetch(url);
+  const listFetched = await result.json();
 
-  //// Exemplo de endpoint: https://api.tvmaze.com/search/shows?q=lost
+  messageStatus.innerHTML = "";
+  showsList.innerHTML = "";
 
-  //// Elementos de leiaute importantes:
+  console.log(messageStatus,showsList,url,result.ok);
 
-  //  #message: use para exibir mensagens aos usuário, por exemplo:
+  if (!result.ok) {
+    messageStatus.innerHTML = "Failed to fetch results.";
+    return;
+  }
 
-  const message = document.querySelector('#message');
-  message.innerHTML = 'exercício ainda não resolvido.';
+  if (listFetched.length === 0) {
+    messageStatus.innerText = "Not Found!"
+    return;
+  }
 
-  //  #shows: conterá os shows, cada um em um <li>, por exemplo:
-  // <li>
-  //   <img class="poster" src="https://static.tvmaze.com/uploads/images/medium_portrait/0/1389.jpg" />
-  //   <span class="show-name">Lost</span>
-  // </li>
+  listFetched.forEach((item) => {
+    const showName = item?.show?.name;
+    const showImage = item?.show?.image?.medium || "";
+
+    showsList.insertAdjacentHTML("beforeend", `
+            <li>
+                <img class="poster" src="${showImage}" />
+                <span class="show-name">${showName}</span>
+            </li>
+    `)
+  });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
